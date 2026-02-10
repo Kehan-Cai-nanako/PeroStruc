@@ -49,7 +49,7 @@ optimize.optimize(filename = './PMN_conf.lmp',
                   model = "./PMN_model.pb",
                   temperature = 300.0, 
                   cell_size = np.array([12, 12, 12]), 
-                  element_list = ['Mg', 'Nb','O','Pb'], 
+                  element_list = ['Mg', 'Nb', 'O', 'Pb'], 
                   B_site_elements = ['Mg', 'Nb'], 
                   neighbor_cutoff = 6,    # allow nearest and next-nearest neighbor swap.
                   traj_dir = 'trajs', 
@@ -59,3 +59,9 @@ optimize.optimize(filename = './PMN_conf.lmp',
                   fire_max_steps = 50,    # maximum number of steps for the FIRE optimization
                   )
 ```
+
+Examples with more details can be found in the directory [`examples/`](examples/).
+
+## Documentation
+
+Full HTML documentation can be found in the directory [`docs/build/`](docs/build/).

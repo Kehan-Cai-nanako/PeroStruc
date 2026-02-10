@@ -41,7 +41,7 @@ The **B-sites** are occupied by Mg/Nb atoms. (Replace the configuration and mode
                      model = "./PMN_model.pb",
                      temperature = 300.0, 
                      cell_size = np.array([12, 12, 12]), 
-                     element_list = ['Mg', 'Nb','O','Pb'], 
+                     element_list = ['Mg', 'Nb', 'O', 'Pb'], 
                      B_site_elements = ['Mg', 'Nb'], 
                      neighbor_cutoff = 6,    # allow nearest and next-nearest neighbor swap.
                      traj_dir = 'trajs', 
@@ -54,7 +54,7 @@ The **B-sites** are occupied by Mg/Nb atoms. (Replace the configuration and mode
     optimize.restart(model = "./PMN_model.pb",
                      temperature = 300.0, 
                      cell_size = np.array([12, 12, 12]), 
-                     element_list = ['Mg', 'Nb','O','Pb'], 
+                     element_list = ['Mg', 'Nb', 'O', 'Pb'], 
                      B_site_elements = ['Mg', 'Nb'], 
                      neighbor_cutoff = 6,    # allow nearest and next-nearest neighbor swap.
                      traj_dir = 'trajs', 

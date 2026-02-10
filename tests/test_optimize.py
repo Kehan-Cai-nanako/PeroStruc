@@ -2,7 +2,7 @@ import numpy as np
 from perostruc import optimize
 
 if __name__ == '__main__':
-    flag_test_optimize = 0
+    flag_test_optimize = 1
     if flag_test_optimize != 0:
         optimize.optimize(filename = './initial_configs/sublattice_L12X12X12.lmp',
                           model = "./unipero.pb",
