@@ -64,4 +64,4 @@ Examples with more details can be found in the directory [`examples/`](examples/
 
 ## Documentation
 
-Full HTML documentation can be found in the directory [`docs/build/`](docs/build/).
+See the full instruction on [GitHub Pages](https://kehan-cai-nanako.github.io/PeroStruc/).
