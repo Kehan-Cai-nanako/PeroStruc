@@ -76,7 +76,5 @@ See the full instruction on [GitHub Pages](https://kehan-cai-nanako.github.io/Pe
 ##### 3. Allow multiple more than 2 A/B-site species (e.g., Mg/Nb/Ti)
 
 ##### 4. Complete the example of Pb_xSr_{1-x}TiO_3 and PbZr_xTi_{1-x}O_3
-
-##### 5. Dependency (deepmd-kit)
-
+ 
 if deepmd-kit can not be automatically installied when pip install, we should write the instruction to install deepmd-kit first.
