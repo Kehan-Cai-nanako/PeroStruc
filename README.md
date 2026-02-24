@@ -89,5 +89,4 @@ See the full instruction on [GitHub Pages](https://kehan-cai-nanako.github.io/Pe
 1. Make Breadth-first search (BFS) a module. 
 2. Logo.
 3. Documentation. 
-4. Add a visualization module.
-5. PMN analyze Pb order parameter.
+4. PMN analyze Pb order parameter.

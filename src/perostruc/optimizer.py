@@ -3,16 +3,15 @@ from re import A
 from time import time
 import numpy as np
 import glob
-import csv
 import ase
-import warnings
+import pickle
 from ase.optimize import FIRE
 from ase.io import write, read
 from ase.filters import FrechetCellFilter
 from perostruc.utility import *
 
 
-"""
+"""s
 Simulation Parameters
 """
 
@@ -68,7 +67,6 @@ class FIRESwapOptimizer:
                 self.temperature, self.fmax, self.fire_max_steps, self.neighbor_cutoff))
             f.write('# iter, energy_before [eV], energy_after [eV], acceptance, time_cost, \n')
 
-
     def _build_swap_site_list(self, atoms: ase.Atoms):
         """Build neighbor list for A- and B-sites, respectively."""
         sym = atoms.get_chemical_symbols()
@@ -86,7 +84,7 @@ class FIRESwapOptimizer:
         A_neighborlist = []
         B_neighborlist = []
         for asite_idx in A_indices:
-            nb_idx, nb_sym, nb_dist = get_neighbor(atoms, asite_idx, cutoff=self.neighbor_cutoff)
+            nb_idx, nb_sym, nb_dist = get_neighbor(atoms, asite_idx, cutoff=self.neighbor_cutoff)  ## this returns the indices ordered by distance from low to high
             nb_A_idx = []
             for _idx, _sym in zip(nb_idx, nb_sym):
                 if _sym in self.A_site_elements:
@@ -95,7 +93,7 @@ class FIRESwapOptimizer:
                 raise ValueError('Each A-site should have equal to or more than 6 nearest neighbors. Here it has {}'.format(len(nb_A_idx)))
             A_neighborlist.append(nb_A_idx)
         for bsite_idx in B_indices:
-            nb_idx, nb_sym, nb_dist = get_neighbor(atoms, bsite_idx, cutoff=self.neighbor_cutoff)
+            nb_idx, nb_sym, nb_dist = get_neighbor(atoms, bsite_idx, cutoff=self.neighbor_cutoff)  ## this returns the indices ordered by distance from low to high
             nb_B_idx = []
             for _idx, _sym in zip(nb_idx, nb_sym):
                 if _sym in self.B_site_elements:
@@ -113,7 +111,64 @@ class FIRESwapOptimizer:
         }
         return None
 
-    def initialize(self, supercell_size: list[int], init_config=None, calculator=None, restart: bool = False) -> None:
+    def save_neighborlist(self):
+        """
+        Save the neighborlist of the A- and B-site atoms to a pickle file.
+        """
+        with open('A_neighborlist.pkl', 'wb') as f:
+            pickle.dump(self.A_neighborlist, f)
+        with open('B_neighborlist.pkl', 'wb') as f:
+            pickle.dump(self.B_neighborlist, f)
+        return None
+    
+    def load_neighborlist(self):
+        """
+        Load the neighborlist of the A- and B-site atoms from a pickle file.
+        """
+        with open('A_neighborlist.pkl', 'rb') as f:
+            self.A_neighborlist = pickle.load(f)
+        with open('B_neighborlist.pkl', 'rb') as f:
+            self.B_neighborlist = pickle.load(f)
+        return None
+
+    def get_lattice_map(self, type: str, latt_size: list[int]) -> np.ndarray:
+        """
+        Get the lattice map of the A- or B-site atoms.
+        Parameters:
+            type: str
+                The type of the site to get the lattice map. Can be 'A' or 'B'.
+            latt_size: list[int]
+                The size of the lattice.  If this is a L1 X L2 X L3 supercell, then latt_size = [L1, L2, L3].
+        Returns:
+            lattice_map: np.ndarray of shape (l1, l2, l3) with integer value of indices of the site atoms
+                The lattice map of the A- or B-site atoms.
+        """
+        ## sanity check
+        if type == 'A':
+            site_indices = self.A_neighborlist['indices']
+        elif type == 'B':
+            site_indices = self.B_neighborlist['indices']
+        else:
+            raise ValueError('The type should be either "A" or "B".')
+        assert len(latt_size) == 3, 'The lattice size should be a list of 3 integers.'
+        l1, l2, l3 = latt_size
+        assert l1 * l2 * l3 == len(site_indices), 'The number of site indices should be equal to the product of the lattice size.'
+        ## get the lattice map
+        lattice_map = np.zeros((l1, l2, l3), dtype=int) - 1  ## -1 means the lattice site is empty
+        scaled_pos = self.atoms.get_scaled_positions()[site_indices]
+        assert scaled_pos.min() >= 0 and scaled_pos.max() <= 1, 'the scaled positions of the site atoms are not in the unit cell'
+        origin = scaled_pos.min(axis=0)
+        scaled_pos = scaled_pos - origin
+        latt_i = np.round(scaled_pos[:,0] * l1).astype(int) % l1
+        latt_j = np.round(scaled_pos[:,1] * l2).astype(int) % l2
+        latt_k = np.round(scaled_pos[:,2] * l3).astype(int) % l3
+        for site_idx, _i, _j, _k in zip(site_indices, latt_i, latt_j, latt_k):
+            lattice_map[_i,_j,_k] = site_idx
+        if lattice_map.min() == -1:
+            raise ValueError('some lattice sites are empty. Please check if the initial configuration is correct.')
+        return lattice_map
+
+    def initialize(self, supercell_size: list[int], init_config=None, calculator=None, restart: bool = False, build_neighborlist: bool = True) -> None:
         """
         Initialize optimization from scratch. The given initial configuration is a ASE Atoms object. It should already has an calculator.
         Parameters:
@@ -164,7 +219,8 @@ class FIRESwapOptimizer:
         if len(self.atoms) != self.ncell * 5:
             raise ValueError('The number of atoms in the initial configuration is not equal to the product of the perovskite supercell size times 5.')
         ## initialize
-        self._build_swap_site_list(self.atoms)
+        if build_neighborlist is True:
+            self._build_swap_site_list(self.atoms)
         return None
 
     def run_FIRE(self, fmax=0.02, steps=1000, flexible_cell: bool = False) -> None:
@@ -261,4 +317,38 @@ class FIRESwapOptimizer:
                     sym[atom1_idx], sym[atom2_idx], energy_diff))
             with open(self.mc_log_file, 'a') as f:
                 f.write('{}, {}, {}, {}, {}\n'.format(i, penergy, penergy_new, accept, t1 - t0))
+ 
+    def get_pair_product(self, atoms: ase.Atoms, score_map: dict[str, float], type: str = 'A') -> float:
+        """
+        Calculate the order parameter O = \sum_{i\sim j} s_i s_j / N /6, where s_i is the score of the i-th atom, and N is the number of cells. 
+        The sum is over all pairs of nearest-neighbor site-A (or B, specified by `type`) atoms (there are 6 nearest neighbors for each site).
+        score_map is a dictionary that maps the element on A (or B, specified by `type`) site to the score. For example, {'Pb': -1.0, 'Sr': 1.0} for PST.
+        """
+        if type == 'A':
+            elements = self.A_site_elements
+            site_indices = self.A_neighborlist['indices']
+            site_neighborlist = self.A_neighborlist['neighborlist']
+        elif type == 'B':
+            elements = self.B_site_elements
+            site_indices = self.B_neighborlist['indices']
+            site_neighborlist = self.B_neighborlist['neighborlist']
+        else:
+            raise ValueError('The type should be either "A" or "B".')
+        for element in elements:
+            assert element in score_map, 'The element {} is not in the score map'.format(element)
+        order_parameter = 0.0
+        syms = atoms.get_chemical_symbols()
+        for site_idx, nb_indices in zip(site_indices, site_neighborlist):
+            sym_center = syms[site_idx]
+            score_center = score_map[sym_center]
+            if len(nb_indices) < 6:
+                raise ValueError('Each site should have equal to or more than 6 nearest neighbors. Here it has {}'.format(len(nb_indices)))
+            else:
+                nnb_indices = nb_indices[:6]  ## note that the indices are already ordered by distance from low to high
+            for nb_idx in nnb_indices:
+                sym_nb = syms[nb_idx]
+                score_nb = score_map[sym_nb]
+                order_parameter += score_center * score_nb
+        order_parameter = order_parameter / len(site_indices) / 6.0
+        return order_parameter
  
