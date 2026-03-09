@@ -46,3 +46,7 @@ plt.ylabel(r'$O(\mathbf{s})$')
 plt.xlabel('Iterations')
 plt.tight_layout()
 plt.savefig('order_parameter.png', dpi=300)
+
+## 
+save_data = np.array([iters, global_params])
+np.save('order_parameter.npy', save_data)

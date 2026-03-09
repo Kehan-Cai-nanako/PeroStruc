@@ -4,11 +4,12 @@ import matplotlib.pyplot as plt
 
 
 # data = np.loadtxt('logs/energy_accepted.csv', skiprows=1, delimiter=',')
+natoms = 6 * 6 * 6 * 5
 mc_log_file = os.path.join('logs', 'mc.log')
 mc_log = np.loadtxt(mc_log_file, skiprows=2, delimiter=',')
 iters = mc_log[:, 0]  ## the iteration index of the accepted trial
 energy = mc_log[:, 2]  ## the energy of the accepted trial
-
+energy = (energy - energy[0]) * 1000 / natoms
 
 fig, ax = plt.subplots(figsize=(10, 6))
 ax.plot(iters, energy)
