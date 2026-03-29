@@ -10,5 +10,5 @@
    :toctree:
    :recursive:
 
-   optimize
+   optimizer
    utility

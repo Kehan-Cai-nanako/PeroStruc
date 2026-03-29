@@ -1,6 +1,6 @@
 # PeroStruc: Disordered Perovskite Monte Carlo Optimizer
 
-A Python package aimed to sample chemically disordered atomic configurations of **complex perovskites** (e.g., Pb(Mg<sub>1/3</sub>Nb<sub>2/3</sub>)O<sub>3</sub>) and perovskite solid solutions (e.g., Pb<sub>x</sub>Sr<sub>1-x</sub>TiO<sub>3</sub>)
+A Python package for sampling compositional and geometric structures of **complex perovskites** (e.g., Pb(Mg<sub>1/3</sub>Nb<sub>2/3</sub>)O<sub>3</sub>) and perovskite solid solutions (e.g., Pb<sub>x</sub>Sr<sub>1-x</sub>TiO<sub>3</sub>).
 
 ## Methodology
 
@@ -31,7 +31,7 @@ python -m pip install -e .
 A typical workflow is:
 
 1. Build an initial perovskite structure (e.g., ABO<sub>3</sub>).
-2. Specify a force-field model for the perovskite. This step is not handled by this package. Please use your favorite force-field model. Note that this package can work with any force-field model as long as it can be used as a ASE calculator. For example, you can use the Deep Potential (DP) (https://github.com/deepmodeling/deepmd-kit) model, which already has a ASE calculator interface.
+2. Specify a force-field model for the perovskite. This step is not handled by this package. Please use your favorite force-field model. Note that this package can work with any force-field model as long as it can be used as a ASE calculator. For example, you can use the [Deep Potential (DP)](https://github.com/deepmodeling/deepmd-kit) model, which already has a ASE calculator interface.
 3. Use the `FIRESwapOptimizer` class to initialize the optimizer. You should specify the initial configuration, the force-field model, and the simulation parameters.
 4. Optimize the structure by calling `optimize()`, which conducts Monte Carlo swaps and records accepted structures / energies.
 5. (Optional) Restart the optimization from a previous run by using the `restart()` method.
@@ -83,7 +83,3 @@ Examples with more details can be found in the directory [`examples/`](examples/
 ## Documentation
 
 See the full instruction on [GitHub Pages](https://kehan-cai-nanako.github.io/PeroStruc/).
-
-## TODO
-
-- Documentation. 
