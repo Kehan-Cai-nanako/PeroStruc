@@ -1,10 +1,10 @@
 # PeroStruc: Disordered Perovskite Monte Carlo Optimizer
 
-A Python package for sampling compositional and geometric structures of **complex perovskites** (e.g., Pb(Mg<sub>1/3</sub>Nb<sub>2/3</sub>)O<sub>3</sub>) and perovskite solid solutions (e.g., Pb<sub>x</sub>Sr<sub>1-x</sub>TiO<sub>3</sub>).
+A Python package for sampling compositional and geometric structures of **complex perovskites** (e.g., Pb(Mg<sub>1/3</sub>Nb<sub>2/3</sub>)O<sub>3</sub>) and **perovskite solid solutions** (e.g., Pb<sub>x</sub>Sr<sub>1-x</sub>TiO<sub>3</sub>).
 
 ## Methodology
 
-The package uses a hybrid **Molecular Dynamics (MD)** and **Monte Carlo (MC)** approach called **FIRESwap**
+The package uses a hybrid **Molecular Dynamics (MD)** and **Monte Carlo (MC)** approach called **FIRESwap**:
 
 - Propose a trial move by **swapping A-site (or B-site) species**;
 - Optimize the new strucutre;
