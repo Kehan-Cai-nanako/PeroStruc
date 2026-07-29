@@ -283,6 +283,11 @@ class FIRESwapOptimizer:
             sym_new[atom2_idx] = sym[atom1_idx]
             atoms_new = self.atoms.copy()
             atoms_new.set_chemical_symbols(sym_new)
+            atoms_new.arrays["type"] = np.array(
+                [self.element_specorder.index(symbol) + 1
+                    for symbol in atoms_new.get_chemical_symbols()],
+                dtype=int,
+            )
             atoms_new.calc = self.atoms.calc
 
             ## optimize the new atoms
